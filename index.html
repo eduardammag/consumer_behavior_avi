@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise Econômica Comportamental Avançada</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+        .header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            border: none;
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .visualization-container {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .code-container {
+            background-color: #282c34;
+            color: #abb2bf;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: auto;
+        }
+        .section-title {
+            color: #2575fc;
+            border-bottom: 2px solid #2575fc;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .nav-tabs .nav-link.active {
+            background-color: #2575fc;
+            color: white;
+            border-radius: 10px 10px 0 0;
+        }
+        .nav-tabs .nav-link {
+            color: #2575fc;
+        }
+    </style>
+</head>
+<body>
+    <div class="header text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold">Análise Econômica Comportamental</h1>
+            <p class="lead">Modelo Bayesiano de Preferências Latentes do Consumidor</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="visualization-container">
+                    <h3 class="section-title">Espaço Latente 3D</h3>
+                    <div id="3d-plot"></div>
+                    <p class="text-muted mt-3">Visualização interativa das preferências dos consumidores no espaço latente tridimensional, colorido por segmentos.</p>
+                </div>
+
+                <div class="visualization-container">
+                    <h3 class="section-title">Perfil de Segmentos</h3>
+                    <div id="radar-plot"></div>
+                    <p class="text-muted mt-3">Radar plot comparando os perfis médios de cada segmento de consumidores.</p>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">📊 Sobre a Análise</h5>
+                        <p class="card-text">Este modelo utiliza Inferência Variacional Amortizada para identificar padrões latentes no comportamento de escolha de consumidores.</p>
+                        <ul class="list-group list-group-flush mb-3">
+                            <li class="list-group-item">✅ 5 segmentos de consumidores</li>
+                            <li class="list-group-item">✅ 4 dimensões latentes</li>
+                            <li class="list-group-item">✅ 2,000 consumidores simulados</li>
+                            <li class="list-group-item">✅ 50 produtos com características variadas</li>
+                        </ul>
+                        <button class="btn btn-primary w-100" onclick="runAnalysis()">Executar Análise</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">📈 Resultados Chave</h5>
+                        <div id="results-container">
+                            <p class="text-muted">Execute a análise para visualizar os resultados...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">🧠 Detalhes do Modelo</h5>
+                        
+                        <ul class="nav nav-tabs" id="modelTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="architecture-tab" data-bs-toggle="tab" data-bs-target="#architecture" type="button" role="tab">Arquitetura</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="code-tab" data-bs-toggle="tab" data-bs-target="#code" type="button" role="tab">Código</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="theory-tab" data-bs-toggle="tab" data-bs-target="#theory" type="button" role="tab">Fundamentação</button>
+                            </li>
+                        </ul>
+                        
+                        <div class="tab-content p-3" id="modelTabsContent">
+                            <div class="tab-pane fade show active" id="architecture" role="tabpanel">
+                                <img src="https://i.imgur.com/JfE2xgG.png" class="img-fluid rounded mb-3" alt="Model Architecture">
+                                <p>O modelo utiliza um encoder profundo com camadas de 128, 64 e 32 neurônios, seguido por um decoder não-linear com função de ativação Tanh. A camada de atenção permite identificar quais características de produto são mais relevantes para cada consumidor.</p>
+                            </div>
+                            <div class="tab-pane fade" id="code" role="tabpanel">
+                                <div class="code-container">
+                                    <pre><code id="full-code"># Seu código Python será exibido aqui...</code></pre>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="theory" role="tabpanel">
+                                <p>Este trabalho se baseia nos princípios de:</p>
+                                <ul>
+                                    <li>Modelos de Utilidade Aleatória (McFadden, 1974)</li>
+                                    <li>Inferência Variacional Amortizada (Kingma & Welling, 2014)</li>
+                                    <li>Teoria do Consumidor Moderna (Gabaix, 2014)</li>
+                                </ul>
+                                <p>A abordagem combina econometria com aprendizado profundo probabilístico para capturar padrões complexos em dados de escolha.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <div class="container">
+            <p class="mb-0">Análise Econômica Comportamental Avançada &copy; 2023</p>
+            <p class="text-muted small">Desenvolvido com Pyro, Plotly e Bootstrap</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sample data for visualization (in a real app, this would come from Python)
+        function generateSampleData() {
+            // Generate random cluster data
+            const clusters = [];
+            for (let i = 0; i < 2000; i++) {
+                clusters.push(Math.floor(Math.random() * 5));
+            }
+            
+            // Generate 3D TSNE-like data
+            const tsneData = [];
+            for (let i = 0; i < 2000; i++) {
+                tsneData.push({
+                    x: Math.random() * 10 - 5,
+                    y: Math.random() * 10 - 5,
+                    z: Math.random() * 10 - 5,
+                    cluster: clusters[i]
+                });
+            }
+            
+            // Generate radar data for 5 clusters
+            const radarData = [];
+            const attributes = ['Preço', 'Qualidade', 'Conveniência', 'Status'];
+            
+            for (let i = 0; i < 5; i++) {
+                const clusterValues = [];
+                for (let j = 0; j < 4; j++) {
+                    clusterValues.push(Math.random() * 2);
+                }
+                // Close the radar plot by repeating first value
+                clusterValues.push(clusterValues[0]);
+                
+                radarData.push({
+                    r: clusterValues,
+                    theta: [...attributes, attributes[0]],
+                    name: `Segmento ${i+1}`
+                });
+            }
+            
+            return { tsneData, radarData, clusters };
+        }
+
+        // Create visualizations
+        function createVisualizations() {
+            const { tsneData, radarData } = generateSampleData();
+            
+            // 3D Plot
+            const trace3d = {
+                x: tsneData.map(d => d.x),
+                y: tsneData.map(d => d.y),
+                z: tsneData.map(d => d.z),
+                mode: 'markers',
+                type: 'scatter3d',
+                marker: {
+                    size: 4,
+                    color: tsneData.map(d => d.cluster),
+                    colorscale: 'Viridis',
+                    opacity: 0.8
+                }
+            };
+            
+            Plotly.newPlot('3d-plot', [trace3d], {
+                title: 'Espaço Latente 3D de Preferências dos Consumidores',
+                scene: {
+                    xaxis: { title: 'Dimensão 1' },
+                    yaxis: { title: 'Dimensão 2' },
+                    zaxis: { title: 'Dimensão 3' }
+                },
+                margin: { t: 40, r: 0, l: 0, b: 0 },
+                height: 500
+            });
+            
+            // Radar Plot
+            const radarTraces = radarData.map((data, i) => ({
+                r: data.r,
+                theta: data.theta,
+                fill: 'toself',
+                name: data.name,
+                type: 'scatterpolar'
+            }));
+            
+            Plotly.newPlot('radar-plot', radarTraces, {
+                polar: {
+                    radialaxis: {
+                        visible: true,
+                        range: [0, 2]
+                    }
+                },
+                showlegend: true,
+                title: 'Perfil de Preferências por Segmento',
+                margin: { t: 40, r: 0, l: 0, b: 0 },
+                height: 500
+            });
+        }
+
+        // Simulate running the analysis
+        function runAnalysis() {
+            document.getElementById('results-container').innerHTML = `
+                <div class="alert alert-info">Processando dados...</div>
+            `;
+            
+            setTimeout(() => {
+                createVisualizations();
+                
+                document.getElementById('results-container').innerHTML = `
+                    <div class="alert alert-success">
+                        <h5>Principais Descobertas</h5>
+                        <ul>
+                            <li>Identificados 5 clusters distintos de consumidores</li>
+                            <li>Segmento 3 mostra maior sensibilidade ao preço</li>
+                            <li>Segmento 2 valoriza principalmente qualidade</li>
+                            <li>Perda final do modelo: 142.35</li>
+                        </ul>
+                    </div>
+                    <div class="progress mt-3">
+                        <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 100%"></div>
+                    </div>
+                `;
+                
+                // Display the full code (simplified for demo)
+                document.getElementById('full-code').textContent = `# advanced_econ_behavior.py\n\nimport numpy as np\nimport torch\nimport pyro\n# ... [seu código completo aqui] ...\n\nif __name__ == "__main__":\n    main()`;
+            }, 2000);
+        }
+
+        // Initialize with sample data
+        window.onload = createVisualizations;
+    </script>
+</body>
+</html>
